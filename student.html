@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Students - StudentFlow</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Student Management</h2>
+
+  <form onsubmit="saveStudent(event)">
+    <input type="hidden" id="studentId">
+    <input type="text" id="name" placeholder="Student Name" required>
+    <button type="submit">Save</button>
+  </form>
+
+  <ul id="studentList"></ul>
+
+  <script>
+    let students = JSON.parse(localStorage.getItem('students')) || [];
+
+    function renderStudents() {
+      const list = document.getElementById('studentList');
+      list.innerHTML = '';
+
+      students.forEach((student, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          ${student.name}
+          <button onclick="editStudent(${index})">Edit</button>
+          <button onclick="deleteStudent(${index})">Delete</button>
+        `;
+        list.appendChild(li);
+      });
+
+      localStorage.setItem('students', JSON.stringify(students));
+    }
+
+    function saveStudent(e) {
+      e.preventDefault();
+      const id = document.getElementById('studentId').value;
+      const name = document.getElementById('name').value;
+
+      if (id === '') {
+        // CREATE
+        students.push({ name });
+      } else {
+        // UPDATE
+        students[id].name = name;
+      }
+
+      document.getElementById('studentId').value = '';
+      document.getElementById('name').value = '';
+      renderStudents();
+    }
+
+    function editStudent(index) {
+      document.getElementById('studentId').value = index;
+      document.getElementById('name').value = students[index].name;
+    }
+
+    function deleteStudent(index) {
+      if (confirm('Delete this student?')) {
+        students.splice(index, 1);
+        renderStudents();
+      }
+    }
+
+    // Initial render
+    renderStudents();
+  </script>
+</body>
+</html>
